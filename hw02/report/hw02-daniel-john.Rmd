@@ -1,0 +1,160 @@
+---
+title: "hw02-daniel-john"
+author: "Daniel John"
+date: "March 4, 2018"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.path = '../images')
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+
+```{r}
+library('dplyr')
+library('ggplot2')
+```
+
+```{r}
+curry <- read.csv("C:/Users/Daniel/Desktop/school/spring_2018/stat_133/hw-stat133/hw02/data/stephen-curry.csv", stringsAsFactors = FALSE)
+curry$name <- 'Stephen Curry'
+curry$shot_made_flag <- as.character(curry$shot_made_flag)
+curry$shot_made_flag[curry$shot_made_flag == "n"] <- "missed shot"
+curry$shot_made_flag[curry$shot_made_flag == "y"] <- "made shot"
+curry <- mutate(curry, minute = (period*12) - minutes_remaining)
+curry
+
+thompson <- read.csv("C:/Users/Daniel/Desktop/school/spring_2018/stat_133/hw-stat133/hw02/data/klay-thompson.csv", stringsAsFactors = FALSE)
+thompson$name <- 'Klay Thompson'
+thompson$shot_made_flag <- as.character(thompson$shot_made_flag)
+thompson$shot_made_flag[thompson$shot_made_flag == "n"] <- "missed shot"
+thompson$shot_made_flag[thompson$shot_made_flag == "y"] <- "made shot"
+thompson <- mutate(thompson, minute = (period*12) - minutes_remaining)
+thompson
+
+durant <- read.csv("C:/Users/Daniel/Desktop/school/spring_2018/stat_133/hw-stat133/hw02/data/kevin-durant.csv", stringsAsFactors = FALSE)
+durant$name <- 'Kevin Durant'
+durant$shot_made_flag <- as.character(durant$shot_made_flag)
+durant$shot_made_flag[durant$shot_made_flag == "n"] <- "missed shot"
+durant$shot_made_flag[durant$shot_made_flag == "y"] <- "made shot"
+durant <- mutate(durant, minute = (period*12) - minutes_remaining)
+durant
+
+green <- read.csv("C:/Users/Daniel/Desktop/school/spring_2018/stat_133/hw-stat133/hw02/data/draymond-green.csv", stringsAsFactors = FALSE)
+green$name <- 'Draymond Green'
+green$shot_made_flag <- as.character(green$shot_made_flag)
+green$shot_made_flag[green$shot_made_flag == "n"] <- "missed shot"
+green$shot_made_flag[green$shot_made_flag == "y"] <- "made shot"
+green <- mutate(green, minute = (period*12) - minutes_remaining)
+green
+
+iguodala <- read.csv("C:/Users/Daniel/Desktop/school/spring_2018/stat_133/hw-stat133/hw02/data/andre-iguodala.csv", stringsAsFactors = FALSE)
+iguodala$name <- 'Andre Iguodala'
+iguodala$shot_made_flag <- as.character(iguodala$shot_made_flag)
+iguodala$shot_made_flag[iguodala$shot_made_flag == "n"] <- "missed shot"
+iguodala$shot_made_flag[iguodala$shot_made_flag == "y"] <- "made shot"
+iguodala <- mutate(iguodala, minute = (period*12) - minutes_remaining)
+iguodala
+```
+
+
+
+```{r}
+# 5.1) Total Shots by Player
+gsw_shots <- bind_rows(curry, durant, green, iguodala, thompson)
+gsw_shots
+select(gsw_shots, "name", "shot_type")
+
+curry_shots <- select(curry, "shot_type")
+durant_shots <- select(durant, "shot_type")
+green_shots <- select(green, "shot_type")
+iguodala_shots <- select(iguodala, "shot_type")
+thompson_shots <- select(thompson, "shot_type")
+
+num_curry_shots <- summarise(curry_shots, n())
+num_durant_shots <- summarise(durant_shots, n())
+num_green_shots <- summarise(green_shots, n())
+num_iguodala_shots <- summarise(iguodala_shots, n())
+num_thompson_shots <- summarise(thompson_shots, n())
+
+num_curry_shots
+num_durant_shots
+num_green_shots
+num_iguodala_shots
+num_thompson_shots
+
+n <- c(num_curry_shots, num_durant_shots, num_green_shots, num_iguodala_shots, num_thompson_shots)
+s <- c("stephen curry", "kevin durant", "draymond green", "andre iguodala", "klay thompson")
+n
+
+data.frame(row.names = s)
+
+# 5.2) Effective Shooting Percentage
+data.frame(row.names = s)
+
+n
+s
+
+curry
+
+```
+
+```{r}
+# 6.1) dplyr table
+gsw_shots
+
+shot_distance_col <- select(gsw_shots, shot_distance)
+shot_distance_col
+
+made_shot_col <- select(gsw_shots, shot_made_flag)
+made_shot_col
+
+dist_and_made <- bind_cols(shot_distance_col, made_shot_col)
+dist_and_made
+
+# 6.2) ggplot
+ggplot(dist_and_made, 
+       aes(shot_distance, shot_made_flag))+
+  geom_jitter()
+
+## I observe that the closer the distance, the more likely a shot is to be made. I also observe one very obvious outlier, there was a made shot from a distance of over 50. I can confirm that the shorter the distance the more effective the shots. I would say that over 33 feel the chance of making a shot drops to essentially null. Distances between 8 and 22 feet have a 50% or more chance of making a shot.
+```
+
+```{r}
+# 7) Total number of shots by minute of occurrence
+
+shot_time_col <- select(gsw_shots, minute)
+shot_time_col
+
+made_and_time <- bind_cols(shot_time_col, made_shot_col)
+made_and_time
+
+ggplot(made_and_time, 
+       aes(shot_made_flag, minute))+
+  geom_jitter()+
+  geom_path()
+
+```
+
+
