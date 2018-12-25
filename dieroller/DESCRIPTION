@@ -1,0 +1,10 @@
+Package: dieroller
+Title: What the Package Does (simulates dierolling)
+Version: 0.0.0.9000
+Authors@R: person("Daniel", "John", email = "daniel.ignatius.john@berkeley.edu", role = c("aut", "cre"))
+Description: This package simulates rolling a six sided die with user definable probabilities and number of times rolled.
+Depends: R (>= 3.4.3)
+License: Open license. 
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.0.1

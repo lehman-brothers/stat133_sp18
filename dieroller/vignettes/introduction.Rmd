@@ -1,0 +1,55 @@
+```{r}
+# Dieroller Package
+## the package dieroller is a mimimal implementation for simulating rolling a six sided die a specified number of times. Summary statistics and a visualization of the die rolls are also provided in the output. 
+
+# Creating a Die
+## the first step in this package is to create a die, using the function die()
+
+sample_die <- die()
+sample_die
+
+## by default this will create a fair six sided die with a 1/6 probability of landing on each side. These specifications can be changed with changing the arguments "side" and "prob"
+
+weird_die <- die(sides = c('i', 'ii', 'iii', 'iv', 'v', 'vi'))
+loaded_die <- die(prob = c(0.075, 0.1, 0.125, 0.15, 0.20, 0.35))
+
+# Rolling the Die
+## the next step is to specify the die you want to roll and how many times you wish to roll it. Example below shows a user rolling the "loaded_die" example shown above 500 times: 
+
+loaded_roll_500 <- roll(loaded_die, times = 500)
+
+# Summary Roll Info
+## the summary.roll function will provide summary statistics for the user specified die roll. The following example illustrates use of the function: 
+
+set.seed(123)
+fair_50rolls <- roll(fair_die, times = 50)
+fair_50sum <- summary(fair_50rolls)
+
+fair_50sum
+
+## what's in the summary
+class(fair_50sum)
+names(fair_50sum)
+fair_50sum$freqs
+
+# Plot Roll Summary
+## The plot roll function will create a barplot based on the summary statistics above. Below is an example of the use: 
+
+plot_roll(fair_50)
+
+# Other Methods Functions
+## These additional functions include ways to extract, replace, and add different values related to the rolls. Examples are as follows: 
+
+## extracting roll in position 500
+fair500[500]
+
+## replacing last roll
+fair500[500] <- 1
+fair500[500]
+summary(fair500)
+
+## adding 100 rolls
+fair600 <- fair500 + 100
+summary(fair600)
+```
+
