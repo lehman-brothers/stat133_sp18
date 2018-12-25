@@ -1,0 +1,173 @@
+---
+title: "hw04-daniel-john.Rmd"
+author: "Daniel John"
+date: "April 7, 2018"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, error = TRUE, fig.path = '../images/')
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+```{r}
+library("stringr")
+library("XML")
+library("knitr")
+library("ggplot2")
+library("dplyr")
+```
+
+
+```{r}
+# 1.4) Archive of "stringr"
+source("..//..//hw04/code/archive-functions.R")
+
+raw_data <- read_archive('stringr')
+raw_data
+clean_data <- clean_archive('stringr')
+clean_data
+plot_archive('stringr')
+write.csv(clean_data, file = "..//..//hw04/data/stringr-archive.csv")
+
+# 1.5) Archives of "dplyr", "ggplot2", "XML", and "knitr" 
+dplyr_data <- read_archive('dplyr')
+dplyr_data
+clean_dplyr <- clean_archive('dplyr')
+clean_dplyr
+plot_archive('dplyr')
+write.csv(clean_dplyr, file = "..//..//hw04/data/dplyr-archive.csv")
+
+ggplot2_data <- read_archive('ggplot2')
+ggplot2_data
+clean_ggplot2 <- clean_archive('ggplot2')
+clean_ggplot2
+plot_archive('ggplot2')
+write.csv(clean_ggplot2, file = "..//..//hw04/data/ggplot2-archive.csv")
+
+XML_data <- read_archive('XML')
+XML_data
+clean_XML <- clean_archive('XML')
+clean_XML
+plot_archive('XML')
+write.csv(clean_XML, file = "..//..//hw04/data/XML-archive.csv")
+
+knitr_data <- read_archive('knitr')
+knitr_data
+clean_knitr <- clean_archive('knitr')
+clean_knitr
+plot_archive('knitr')
+write.csv(clean_knitr, file = "..//..//hw04/data/knitr-archive.csv")
+
+combo <- rbind(clean_dplyr, clean_ggplot2, clean_XML, clean_knitr)
+ggplot(combo, aes(date, size), aes(color = names)) + geom_point() + geom_step()
+
+ggplot(combo, aes(date, size), aes(color = names), scales = free) + geom_point() + geom_step() + facet_wrap(~names)
+```
+
+```{r}
+# 2) Regex Functions
+source("..//..//hw04/code/regex-functions.R")
+
+# 2.1) Splitting Characters
+split_chars('Go Bears!')
+split_chars('Expecto Patronum')
+
+# 2.2) Number of Vowels
+vec <- c('G', 'o', '', 'B', 'e', 'a', 'r', 's', '!')
+num_vowels(vec)
+
+# 2.3) Counting Vowels
+count_vowels("The quick brown fox jumps over the lazy dog")
+count_vowels("THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG")
+
+# 2.4) Reversing Characters
+reverse_chars("gattaca")
+reverse_chars("Lumox Maxima")
+
+# 2.5) Reversing Sentences by Words
+reverse_words("sentence! this reverse")
+reverse_words("string")
+```
+
+```{r}
+# 3) Data "Emotion in Text"
+emotion <- read.csv("..//..//hw04/data/text_emotion.csv", stringsAsFactors = FALSE)
+
+# 3.1) Number of characters per tweet
+a <- nchar(emotion$content)
+
+# Count the number of characters in tweet contents.
+sum(a)
+
+# Display a summary() of such counts and plot a historgram...
+summary(a)
+
+hist(a, 
+     breaks = 36.8,
+     main = "Number of characters per tweet", 
+     xlab = "Characters",
+     ylab = "Tweets",
+     border = "blue", 
+     col = "aquamarine1")
+```
+
+```{r}
+# 3.2) Number of Mentions
+c <- emotion$content
+c <- str_extract_all(c, pattern = "@[a-z|A-Z|0-9]+")
+d <- str_count(c, "@")
+
+# Count the number of @ mentions
+sum(d)
+
+# Display the frequencies and make a barplot
+e <- table(d)
+barplot(e)
+
+# 3.3) Hashtags
+f <- emotion$content
+f <- str_extract_all(f, pattern = "#[a-z|A-Z|0-9]+")
+g <- str_count(f, "#")
+
+# Number of hashtags in tweet contents
+sum(g)
+
+# Barplot of the counts
+h <- table(g)
+barplot(h)
+
+# Average length of hashtags
+i <- grep("#.", f, value = TRUE)
+j <- nchar(i)
+mean(j)
+
+# Mode of hashtags
+#' @title getmode()
+#' @description calculates the mode of a vector 
+#' @return the numeric mode
+getmode <- function(j){
+   uniqj <- unique(j)
+   uniqj[which.max(tabulate(match(j, uniqj)))]
+   }
+getmode(j)
+```
