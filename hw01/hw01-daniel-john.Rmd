@@ -1,0 +1,183 @@
+---
+title: "hw01-daniel-john"
+author: "Daniel John"
+date: "February 20, 2018"
+output: github_document
+---
+
+## 2) Data Import
+```{r}
+column_names <- c('symboling', 
+                  'normailzed_losses', 
+                  'make', 
+                  'fuel_type', 
+                  'aspiration', 
+                  'num_of_doors', 
+                  'body_style',
+                  'drive_wheels',
+                  'engine_location',
+                  'wheel_base',
+                  'length',
+                  'width',
+                  'height',
+                  'curb_weight',
+                  'engine_type',
+                  'num_of_cylinders',
+                  'engine_size',
+                  'fuel_system',
+                  'bore',
+                  'stroke',
+                  'compression_ratio',
+                  'horsepower',
+                  'peak_rpm',
+                  'city_mpg',
+                  'highway_mpg',
+                  'price')
+```
+
+```{r}
+
+library(readr)
+
+column_classes <- cols(
+  'symboling' = col_double(),
+  'normalized_losses' = col_double(),
+  'make' = col_character(),
+  'fuel_type' = col_character(),
+  'aspiration' = col_character(),
+  'num_of_doors' = col_character(),
+  'body_style' = col_character(),
+  'drive_wheels' = col_character(),
+  'engine_location' = col_character(),
+  'wheel_base' = col_double(),
+  'length' = col_double(),
+  'width' = col_double(),
+  'height' = col_double(),
+  'curb_weight' = col_integer(),
+  'engine_type' = col_character(),
+  'num_of_cylinders' = col_character(),
+  'engine_size' = col_integer(),
+  'fuel_system' = col_character(),
+  'bore' = col_double(),
+  'stroke' = col_double(),
+  'compression_ratio' = col_double(),
+  'horsepower' = col_integer(),
+  'peak_rpm' = col_integer(),
+  'city_mpg' = col_integer(),
+  'highway_mpg' = col_integer(),
+  'price' = col_integer()
+)
+```
+
+```{r}
+imports_85_table <- read.csv(file = 'imports_85.data', 
+         header = FALSE, 
+         col.names = column_names,
+         na.strings = '?',
+         colClasses = column_classes
+         )
+imports_85_table
+
+str(imports_85_table)
+
+object.size(imports_85_table)
+```
+
+```{r}
+library(readr)
+
+imports_85_table_readr <- read_csv('imports_85.data',
+         col_names = column_names,
+         col_types = column_classes,
+         na = c("?","NA")
+         )
+imports_85_table_readr
+
+object.size(imports_85_table)
+
+str(imports_85_table_readr)
+```
+
+## 3) Technical Questions about importing data
+# a. Simply invoking read.csv without specifying column names results in the first row being used as the column header. 
+# b. Invoking read.csv with 'header = FALSE' specified results in the first row being automatically assigned values of "V" with increasing numbers for each column. V1, V2, V3 etc. are assigned as the names of each column.
+# c. When I don't specify "na.strings = '?'", values with no data appear simply as the question mark '?' instead of 'NA'. As a result the data in those columns are treated as factors.
+# d. I would imagine that the table needing to look up and assign each column a specified value rather than just with a default one (V1, V2, V3) requires more memory.
+# e. Converting the data frame into a matrix basically turns all the non-numeric values into "NA". It seems like most of the numbers are still good, but all the other values become "NA" and it looks really bad.
+
+## 4) Practice base plotting
+```{r}
+hist(imports_85_table$price,
+     col = 'aquamarine3')
+
+boxplot(imports_85_table$horsepower,
+        horizontal = TRUE)
+
+barplot_data <- (table(imports_85_table$body_style))
+barplot(barplot_data[c(4,3,5,2,1)])
+
+stars(imports_85_table,
+      full = FALSE,
+      locations = c(5,5),
+      key.loc = c(5,5))
+```
+
+## 5) Summaries
+```{r}
+aggregate(imports_85_table[,c('price')], 
+          by = list(imports_85_table$fuel_type), 
+          FUN = mean, 
+          na.rm = TRUE)
+
+imports_85_table$make[(imports_85_table$num_of_cylinders == 'twelve')]
+
+diesel_by_make <- imports_85_table$make[(imports_85_table$fuel_type == 'diesel')]
+diesel_by_make_table <- table(diesel_by_make)
+diesel_by_make_table[diesel_by_make_table == max(diesel_by_make_table)]
+
+table(imports_85_table[which.max(imports_85_table$horsepower), 'price'])
+
+quantile(imports_85_table$city_mpg, probs = 0.1)
+
+quantile(imports_85_table$highway_mpg, probs = 0.9)
+
+median(na.omit(imports_85_table$price[imports_85_table$city_mpg <= (quantile(imports_85_table$city_mpg, probs = 0.1))]))
+```
+
+## 6) Technical Questions about data frames
+# a. When I do this I get a result that says "0 rows". The code I ran is as follows: data.frame(imports_85_table$xyz)
+# b. Option 4. fails to return the vector. "mtcars[,mpg]"
+# c. This command fails because when mpg is not in quotes it is looking for an object. The error message I get states that "object 'mpg' not found"
+# d. YES. An R list can be used as a column because data frames are not limited to atomic vectors, they can also hold general vectors which are known as lists.
+# e. Values are listed in a disorganized list that almost looks like a table but isn't really one. Each list of values has a header (such as $mpg, $disp) but the data is very hard to read as there is no uniform row indicator.
+# f. I used "data.frame(abc)" and it seemed to work.
+
+## 7) Correlations of quantitative variables
+```{r}
+dat <- imports_85_table[-c(1:9,15:16,18)]
+qdat <- na.omit(dat)
+
+library(corrplot)
+M <- cor(qdat)
+corrplot(M, method = "square")
+corrplot(M, method = "square")
+
+# I observe that there is a stong correlation between city and highway MPG. I also see that there is zero correlation between height and engine size, which is interesting. Not surprisingly, there is a strong negative correlation between both highway and city MPG and curb weight.
+```
+
+## 8.1) Principal components analysis
+```{r}
+prcomp_val <- prcomp(qdat,
+       scale. = TRUE)
+prcomp_val
+
+eigenvalues <- prcomp_val$sdev^2
+eigenvalues[1:3]
+```
+
+## 8.2) PCA plot of vehicles, and PCA plot of variables
+```{r}
+prcomp_val[1:2]
+
+plot(prcomp_val)
+```
